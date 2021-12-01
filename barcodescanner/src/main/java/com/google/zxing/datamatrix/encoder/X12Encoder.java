@@ -39,8 +39,7 @@ final class X12Encoder extends C40Encoder {
 
         int newMode = HighLevelEncoder.lookAheadTest(context.getMessage(), context.pos, getEncodingMode());
         if (newMode != getEncodingMode()) {
-          // Return to ASCII encodation, which will actually handle latch to new mode
-          context.signalEncoderChange(HighLevelEncoder.ASCII_ENCODATION);
+          context.signalEncoderChange(newMode);
           break;
         }
       }
@@ -50,28 +49,20 @@ final class X12Encoder extends C40Encoder {
 
   @Override
   int encodeChar(char c, StringBuilder sb) {
-    switch (c) {
-      case '\r':
-        sb.append('\0');
-        break;
-      case '*':
-        sb.append('\1');
-        break;
-      case '>':
-        sb.append('\2');
-        break;
-      case ' ':
-        sb.append('\3');
-        break;
-      default:
-        if (c >= '0' && c <= '9') {
-          sb.append((char) (c - 48 + 4));
-        } else if (c >= 'A' && c <= 'Z') {
-          sb.append((char) (c - 65 + 14));
-        } else {
-          HighLevelEncoder.illegalCharacter(c);
-        }
-        break;
+    if (c == '\r') {
+      sb.append('\0');
+    } else if (c == '*') {
+      sb.append('\1');
+    } else if (c == '>') {
+      sb.append('\2');
+    } else if (c == ' ') {
+      sb.append('\3');
+    } else if (c >= '0' && c <= '9') {
+      sb.append((char) (c - 48 + 4));
+    } else if (c >= 'A' && c <= 'Z') {
+      sb.append((char) (c - 65 + 14));
+    } else {
+      HighLevelEncoder.illegalCharacter(c);
     }
     return 1;
   }

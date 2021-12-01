@@ -181,7 +181,7 @@ final class DecodeHintManager {
           try {
             array[i] = Integer.parseInt(values[i]);
           } catch (NumberFormatException ignored) {
-            Log.w(TAG, "Skipping array of integers hint " + hintType + " due to invalid numeric value");
+            Log.w(TAG, "Skipping array of integers hint " + hintType + " due to invalid numeric value: '" + values[i] + '\'');
             array = null;
             break;
           }
@@ -194,6 +194,7 @@ final class DecodeHintManager {
       Log.w(TAG, "Unsupported hint type '" + hintType + "' of type " + hintType.getValueType());
     }
 
+    Log.i(TAG, "Hints from the URI: " + hints);
     return hints;
   }
 
@@ -222,12 +223,13 @@ final class DecodeHintManager {
           if (hintType.getValueType().isInstance(hintData)) {
             hints.put(hintType, hintData);
           } else {
-            Log.w(TAG, "Ignoring hint " + hintType + " because it is not a " + hintType.getValueType());
+            Log.w(TAG, "Ignoring hint " + hintType + " because it is not assignable from " + hintData);
           }
         }
       }
     }
 
+    Log.i(TAG, "Hints from the Intent: " + hints);
     return hints;
   }
 

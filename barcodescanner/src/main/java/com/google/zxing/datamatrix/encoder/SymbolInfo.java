@@ -63,15 +63,6 @@ public class SymbolInfo {
 
   private static SymbolInfo[] symbols = PROD_SYMBOLS;
 
-  private final boolean rectangular;
-  private final int dataCapacity;
-  private final int errorCodewords;
-  public final int matrixWidth;
-  public final int matrixHeight;
-  private final int dataRegions;
-  private final int rsBlockData;
-  private final int rsBlockError;
-
   /**
    * Overrides the symbol info set used by this class. Used for testing purposes.
    *
@@ -80,6 +71,15 @@ public class SymbolInfo {
   public static void overrideSymbolSet(SymbolInfo[] override) {
     symbols = override;
   }
+
+  private final boolean rectangular;
+  private final int dataCapacity;
+  private final int errorCodewords;
+  public final int matrixWidth;
+  public final int matrixHeight;
+  private final int dataRegions;
+  private final int rsBlockData;
+  private final int rsBlockError;
 
   public SymbolInfo(boolean rectangular, int dataCapacity, int errorCodewords,
                     int matrixWidth, int matrixHeight, int dataRegions) {
@@ -119,9 +119,9 @@ public class SymbolInfo {
   }
 
   public static SymbolInfo lookup(int dataCodewords,
-                                  SymbolShapeHint shape,
-                                  Dimension minSize,
-                                  Dimension maxSize,
+                                  SymbolShapeHint shape, 
+                                  Dimension minSize, 
+                                  Dimension maxSize, 
                                   boolean fail) {
     for (SymbolInfo symbol : symbols) {
       if (shape == SymbolShapeHint.FORCE_SQUARE && symbol.rectangular) {
@@ -207,11 +207,11 @@ public class SymbolInfo {
   public int getInterleavedBlockCount() {
     return dataCapacity / rsBlockData;
   }
-
+  
   public final int getDataCapacity() {
     return dataCapacity;
   }
-
+  
   public final int getErrorCodewords() {
     return errorCodewords;
   }

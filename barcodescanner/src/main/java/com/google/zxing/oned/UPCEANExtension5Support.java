@@ -96,7 +96,7 @@ final class UPCEANExtension5Support {
     if (extensionChecksum(resultString.toString()) != checkDigit) {
       throw NotFoundException.getNotFoundInstance();
     }
-
+    
     return rowOffset;
   }
 
@@ -153,15 +153,16 @@ final class UPCEANExtension5Support {
         break;
       case '9':
         // Reference: http://www.jollytech.com
-        switch (raw) {
-          case "90000":
-            // No suggested retail price
-            return null;
-          case "99991":
-            // Complementary
-            return "0.00";
-          case "99990":
-            return "Used";
+        if ("90000".equals(raw)) {
+          // No suggested retail price
+          return null;
+        }
+        if ("99991".equals(raw)) {
+          // Complementary
+          return "0.00";
+        }
+        if ("99990".equals(raw)) {
+          return "Used";
         }
         // Otherwise... unknown currency?
         currency = "";

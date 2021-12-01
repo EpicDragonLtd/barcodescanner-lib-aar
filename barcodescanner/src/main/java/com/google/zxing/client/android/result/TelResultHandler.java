@@ -16,11 +16,13 @@
 
 package com.google.zxing.client.android.result;
 
-import com.google.zxing.client.android.R;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.TelParsedResult;
 
 import android.app.Activity;
+import android.telephony.PhoneNumberUtils;
+
+import barcodescanner.xservices.nl.barcodescanner.R;
 
 /**
  * Offers relevant actions for telephone numbers.
@@ -71,7 +73,7 @@ public final class TelResultHandler extends ResultHandler {
   public CharSequence getDisplayContents() {
     String contents = getResult().getDisplayResult();
     contents = contents.replace("\r", "");
-    return formatPhone(contents);
+    return PhoneNumberUtils.formatNumber(contents);
   }
 
   @Override

@@ -265,21 +265,8 @@ public abstract class UPCEANReader extends OneDReader {
     if (length == 0) {
       return false;
     }
-    int check = Character.digit(s.charAt(length - 1), 10);
-    return getStandardUPCEANChecksum(s.subSequence(0, length - 1)) == check;
-  }
 
-  static int getStandardUPCEANChecksum(CharSequence s) throws FormatException {
-    int length = s.length();
     int sum = 0;
-    for (int i = length - 1; i >= 0; i -= 2) {
-      int digit = s.charAt(i) - '0';
-      if (digit < 0 || digit > 9) {
-        throw FormatException.getFormatInstance();
-      }
-      sum += digit;
-    }
-    sum *= 3;
     for (int i = length - 2; i >= 0; i -= 2) {
       int digit = s.charAt(i) - '0';
       if (digit < 0 || digit > 9) {
@@ -287,7 +274,15 @@ public abstract class UPCEANReader extends OneDReader {
       }
       sum += digit;
     }
-    return (1000 - sum) % 10;
+    sum *= 3;
+    for (int i = length - 1; i >= 0; i -= 2) {
+      int digit = s.charAt(i) - '0';
+      if (digit < 0 || digit > 9) {
+        throw FormatException.getFormatInstance();
+      }
+      sum += digit;
+    }
+    return sum % 10 == 0;
   }
 
   int[] decodeEnd(BitArray row, int endStart) throws NotFoundException {
@@ -324,7 +319,7 @@ public abstract class UPCEANReader extends OneDReader {
     int patternLength = pattern.length;
     boolean isWhite = whiteFirst;
     for (int x = rowOffset; x < width; x++) {
-      if (row.get(x) != isWhite) {
+      if (row.get(x) ^ isWhite) {
         counters[counterPosition]++;
       } else {
         if (counterPosition == patternLength - 1) {
@@ -332,9 +327,9 @@ public abstract class UPCEANReader extends OneDReader {
             return new int[]{patternStart, x};
           }
           patternStart += counters[0] + counters[1];
-          System.arraycopy(counters, 2, counters, 0, counterPosition - 1);
-          counters[counterPosition - 1] = 0;
-          counters[counterPosition] = 0;
+          System.arraycopy(counters, 2, counters, 0, patternLength - 2);
+          counters[patternLength - 2] = 0;
+          counters[patternLength - 1] = 0;
           counterPosition--;
         } else {
           counterPosition++;

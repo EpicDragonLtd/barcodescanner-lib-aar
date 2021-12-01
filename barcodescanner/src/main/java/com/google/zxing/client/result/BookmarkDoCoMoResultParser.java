@@ -30,7 +30,7 @@ public final class BookmarkDoCoMoResultParser extends AbstractDoCoMoResultParser
       return null;
     }
     String title = matchSingleDoCoMoPrefixedField("TITLE:", rawText, true);
-    String[] rawUri = matchDoCoMoPrefixedField("URL:", rawText);
+    String[] rawUri = matchDoCoMoPrefixedField("URL:", rawText, true);
     if (rawUri == null) {
       return null;
     }

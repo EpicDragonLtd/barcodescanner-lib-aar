@@ -16,11 +16,13 @@
 
 package com.google.zxing.client.android.result;
 
-import com.google.zxing.client.android.R;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.SMSParsedResult;
 
 import android.app.Activity;
+import android.telephony.PhoneNumberUtils;
+
+import barcodescanner.xservices.nl.barcodescanner.R;
 
 /**
  * Handles SMS addresses, offering a choice of composing a new SMS or MMS message.
@@ -68,7 +70,7 @@ public final class SMSResultHandler extends ResultHandler {
     String[] rawNumbers = smsResult.getNumbers();
     String[] formattedNumbers = new String[rawNumbers.length];
     for (int i = 0; i < rawNumbers.length; i++) {
-      formattedNumbers[i] = formatPhone(rawNumbers[i]);
+      formattedNumbers[i] = PhoneNumberUtils.formatNumber(rawNumbers[i]);
     }
     StringBuilder contents = new StringBuilder(50);
     ParsedResult.maybeAppend(formattedNumbers, contents);

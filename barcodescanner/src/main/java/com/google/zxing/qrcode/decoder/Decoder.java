@@ -57,7 +57,16 @@ public final class Decoder {
    */
   public DecoderResult decode(boolean[][] image, Map<DecodeHintType,?> hints)
       throws ChecksumException, FormatException {
-    return decode(BitMatrix.parse(image), hints);
+    int dimension = image.length;
+    BitMatrix bits = new BitMatrix(dimension);
+    for (int i = 0; i < dimension; i++) {
+      for (int j = 0; j < dimension; j++) {
+        if (image[i][j]) {
+          bits.set(j, i);
+        }
+      }
+    }
+    return decode(bits, hints);
   }
 
   public DecoderResult decode(BitMatrix bits) throws ChecksumException, FormatException {
@@ -123,7 +132,11 @@ public final class Decoder {
       if (fe != null) {
         throw fe;
       }
-      throw ce; // If fe is null, this can't be
+      if (ce != null) {
+        throw ce;
+      }
+      throw e;
+
     }
   }
 

@@ -16,6 +16,8 @@
 
 package com.google.zxing.client.android.encode;
 
+import android.telephony.PhoneNumberUtils;
+
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -67,7 +69,7 @@ final class MECARDContactEncoder extends ContactEncoder {
     return new String[] { newContents.toString(), newDisplayContents.toString() };
   }
 
-  private static final class MECARDFieldFormatter implements Formatter {
+  private static class MECARDFieldFormatter implements Formatter {
     private static final Pattern RESERVED_MECARD_CHARS = Pattern.compile("([\\\\:;])");
     private static final Pattern NEWLINE = Pattern.compile("\\n");
     @Override
@@ -76,15 +78,15 @@ final class MECARDContactEncoder extends ContactEncoder {
     }
   }
 
-  private static final class MECARDTelDisplayFormatter implements Formatter {
-    private static final Pattern NOT_DIGITS_OR_PLUS = Pattern.compile("[^0-9+]+");
+  private static class MECARDTelDisplayFormatter implements Formatter {
+    private static final Pattern NOT_DIGITS = Pattern.compile("[^0-9]+");
     @Override
     public CharSequence format(CharSequence value, int index) {
-      return NOT_DIGITS_OR_PLUS.matcher(ContactEncoder.formatPhone(value.toString())).replaceAll("");
+      return NOT_DIGITS.matcher(PhoneNumberUtils.formatNumber(value.toString())).replaceAll("");
     }
   }
 
-  private static final class MECARDNameDisplayFormatter implements Formatter {
+  private static class MECARDNameDisplayFormatter implements Formatter {
     private static final Pattern COMMA = Pattern.compile(",");
     @Override
     public CharSequence format(CharSequence value, int index) {

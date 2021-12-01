@@ -18,6 +18,7 @@ package com.google.zxing.pdf417.decoder.ec;
 
 /**
  * @author Sean Owen
+ * @see com.google.zxing.common.reedsolomon.GenericGFPoly
  */
 final class ModulusPoly {
 

@@ -43,8 +43,6 @@ import java.util.Map;
  */
 public final class PDF417Reader implements Reader, MultipleBarcodeReader {
 
-  private static final Result[] EMPTY_RESULT_ARRAY = new Result[0];
-
   /**
    * Locates and decodes a PDF417 code in an image.
    *
@@ -61,7 +59,7 @@ public final class PDF417Reader implements Reader, MultipleBarcodeReader {
   public Result decode(BinaryBitmap image, Map<DecodeHintType,?> hints) throws NotFoundException, FormatException,
       ChecksumException {
     Result[] result = decode(image, hints, false);
-    if (result.length == 0 || result[0] == null) {
+    if (result == null || result.length == 0 || result[0] == null) {
       throw NotFoundException.getNotFoundInstance();
     }
     return result[0];
@@ -96,7 +94,7 @@ public final class PDF417Reader implements Reader, MultipleBarcodeReader {
       }
       results.add(result);
     }
-    return results.toArray(EMPTY_RESULT_ARRAY);
+    return results.toArray(new Result[results.size()]);
   }
 
   private static int getMaxWidth(ResultPoint p1, ResultPoint p2) {

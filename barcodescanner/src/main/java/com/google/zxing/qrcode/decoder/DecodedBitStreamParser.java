@@ -58,7 +58,7 @@ final class DecodedBitStreamParser {
     List<byte[]> byteSegments = new ArrayList<>(1);
     int symbolSequence = -1;
     int parityData = -1;
-
+    
     try {
       CharacterSetECI currentCharacterSetECI = null;
       boolean fc1InEffect = false;
@@ -71,15 +71,11 @@ final class DecodedBitStreamParser {
         } else {
           mode = Mode.forBits(bits.readBits(4)); // mode is encoded by 4 bits
         }
-        switch (mode) {
-          case TERMINATOR:
-            break;
-          case FNC1_FIRST_POSITION:
-          case FNC1_SECOND_POSITION:
+        if (mode != Mode.TERMINATOR) {
+          if (mode == Mode.FNC1_FIRST_POSITION || mode == Mode.FNC1_SECOND_POSITION) {
             // We do little with FNC1 except alter the parsed result a bit according to the spec
             fc1InEffect = true;
-            break;
-          case STRUCTURED_APPEND:
+          } else if (mode == Mode.STRUCTURED_APPEND) {
             if (bits.available() < 16) {
               throw FormatException.getFormatInstance();
             }
@@ -87,45 +83,39 @@ final class DecodedBitStreamParser {
             // Read next 8 bits (symbol sequence #) and 8 bits (parity data), then continue
             symbolSequence = bits.readBits(8);
             parityData = bits.readBits(8);
-            break;
-          case ECI:
+          } else if (mode == Mode.ECI) {
             // Count doesn't apply to ECI
             int value = parseECIValue(bits);
             currentCharacterSetECI = CharacterSetECI.getCharacterSetECIByValue(value);
             if (currentCharacterSetECI == null) {
               throw FormatException.getFormatInstance();
             }
-            break;
-          case HANZI:
+          } else {
             // First handle Hanzi mode which does not start with character count
-            // Chinese mode contains a sub set indicator right after mode indicator
-            int subset = bits.readBits(4);
-            int countHanzi = bits.readBits(mode.getCharacterCountBits(version));
-            if (subset == GB2312_SUBSET) {
-              decodeHanziSegment(bits, result, countHanzi);
-            }
-            break;
-          default:
-            // "Normal" QR code modes:
-            // How many characters will follow, encoded in this mode?
-            int count = bits.readBits(mode.getCharacterCountBits(version));
-            switch (mode) {
-              case NUMERIC:
+            if (mode == Mode.HANZI) {
+              //chinese mode contains a sub set indicator right after mode indicator
+              int subset = bits.readBits(4);
+              int countHanzi = bits.readBits(mode.getCharacterCountBits(version));
+              if (subset == GB2312_SUBSET) {
+                decodeHanziSegment(bits, result, countHanzi);
+              }
+            } else {
+              // "Normal" QR code modes:
+              // How many characters will follow, encoded in this mode?
+              int count = bits.readBits(mode.getCharacterCountBits(version));
+              if (mode == Mode.NUMERIC) {
                 decodeNumericSegment(bits, result, count);
-                break;
-              case ALPHANUMERIC:
+              } else if (mode == Mode.ALPHANUMERIC) {
                 decodeAlphanumericSegment(bits, result, count, fc1InEffect);
-                break;
-              case BYTE:
+              } else if (mode == Mode.BYTE) {
                 decodeByteSegment(bits, result, count, currentCharacterSetECI, byteSegments, hints);
-                break;
-              case KANJI:
+              } else if (mode == Mode.KANJI) {
                 decodeKanjiSegment(bits, result, count);
-                break;
-              default:
+              } else {
                 throw FormatException.getFormatInstance();
+              }
             }
-            break;
+          }
         }
       } while (mode != Mode.TERMINATOR);
     } catch (IllegalArgumentException iae) {
@@ -160,7 +150,7 @@ final class DecodedBitStreamParser {
       // Each 13 bits encodes a 2-byte character
       int twoBytes = bits.readBits(13);
       int assembledTwoBytes = ((twoBytes / 0x060) << 8) | (twoBytes % 0x060);
-      if (assembledTwoBytes < 0x00A00) {
+      if (assembledTwoBytes < 0x003BF) {
         // In the 0xA1A1 to 0xAAFE range
         assembledTwoBytes += 0x0A1A1;
       } else {

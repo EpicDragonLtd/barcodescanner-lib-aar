@@ -42,10 +42,14 @@ class C40Encoder implements Encoder {
       if (!context.hasMoreCharacters()) {
         //Avoid having a single C40 value in the last triplet
         StringBuilder removed = new StringBuilder();
-        if ((buffer.length() % 3) == 2 && available != 2) {
-          lastCharSize = backtrackOneCharacter(context, buffer, removed, lastCharSize);
+        if ((buffer.length() % 3) == 2) {
+          if (available < 2 || available > 2) {
+            lastCharSize = backtrackOneCharacter(context, buffer, removed,
+                                                 lastCharSize);
+          }
         }
-        while ((buffer.length() % 3) == 1 && (lastCharSize > 3 || available != 1)) {
+        while ((buffer.length() % 3) == 1
+            && ((lastCharSize <= 3 && available != 1) || lastCharSize > 3)) {
           lastCharSize = backtrackOneCharacter(context, buffer, removed, lastCharSize);
         }
         break;
@@ -55,8 +59,7 @@ class C40Encoder implements Encoder {
       if ((count % 3) == 0) {
         int newMode = HighLevelEncoder.lookAheadTest(context.getMessage(), context.pos, getEncodingMode());
         if (newMode != getEncodingMode()) {
-          // Return to ASCII encodation, which will actually handle latch to new mode
-          context.signalEncoderChange(HighLevelEncoder.ASCII_ENCODATION);
+          context.signalEncoderChange(newMode);
           break;
         }
       }
@@ -76,7 +79,7 @@ class C40Encoder implements Encoder {
   }
 
   static void writeNextTriplet(EncoderContext context, StringBuilder buffer) {
-    context.writeCodewords(encodeToCodewords(buffer));
+    context.writeCodewords(encodeToCodewords(buffer, 0));
     buffer.delete(0, 3);
   }
 
@@ -128,48 +131,47 @@ class C40Encoder implements Encoder {
     if (c == ' ') {
       sb.append('\3');
       return 1;
-    }
-    if (c >= '0' && c <= '9') {
+    } else if (c >= '0' && c <= '9') {
       sb.append((char) (c - 48 + 4));
       return 1;
-    }
-    if (c >= 'A' && c <= 'Z') {
+    } else if (c >= 'A' && c <= 'Z') {
       sb.append((char) (c - 65 + 14));
       return 1;
-    }
-    if (c < ' ') {
+    } else if (c >= '\0' && c <= '\u001f') {
       sb.append('\0'); //Shift 1 Set
       sb.append(c);
       return 2;
-    }
-    if (c <= '/') {
+    } else if (c >= '!' && c <= '/') {
       sb.append('\1'); //Shift 2 Set
       sb.append((char) (c - 33));
       return 2;
-    }
-    if (c <= '@') {
+    } else if (c >= ':' && c <= '@') {
       sb.append('\1'); //Shift 2 Set
       sb.append((char) (c - 58 + 15));
       return 2;
-    }
-    if (c <= '_') {
+    } else if (c >= '[' && c <= '_') {
       sb.append('\1'); //Shift 2 Set
       sb.append((char) (c - 91 + 22));
       return 2;
-    }
-    if (c <= 127) {
+    } else if (c >= '\u0060' && c <= '\u007f') {
       sb.append('\2'); //Shift 3 Set
       sb.append((char) (c - 96));
       return 2;
+    } else if (c >= '\u0080') {
+      sb.append("\1\u001e"); //Shift 2, Upper Shift
+      int len = 2;
+      len += encodeChar((char) (c - 128), sb);
+      return len;
+    } else {
+      throw new IllegalArgumentException("Illegal character: " + c);
     }
-    sb.append("\1\u001e"); //Shift 2, Upper Shift
-    int len = 2;
-    len += encodeChar((char) (c - 128), sb);
-    return len;
   }
 
-  private static String encodeToCodewords(CharSequence sb) {
-    int v = (1600 * sb.charAt(0)) + (40 * sb.charAt(1)) + sb.charAt(2) + 1;
+  private static String encodeToCodewords(CharSequence sb, int startPos) {
+    char c1 = sb.charAt(startPos);
+    char c2 = sb.charAt(startPos + 1);
+    char c3 = sb.charAt(startPos + 2);
+    int v = (1600 * c1) + (40 * c2) + c3 + 1;
     char cw1 = (char) (v / 256);
     char cw2 = (char) (v % 256);
     return new String(new char[] {cw1, cw2});

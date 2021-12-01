@@ -17,13 +17,14 @@
 package com.google.zxing.client.android.result;
 
 import com.google.zxing.client.android.LocaleManager;
-import com.google.zxing.client.android.R;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.URIParsedResult;
 
 import android.app.Activity;
 
 import java.util.Locale;
+
+import barcodescanner.xservices.nl.barcodescanner.R;
 
 /**
  * Offers appropriate actions for URLS.

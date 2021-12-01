@@ -101,6 +101,7 @@ public final class Intents {
     /**
      * Optional parameters to specify the width and height of the scanning rectangle in pixels.
      * The app will try to honor these, but will clamp them to the size of the preview frame.
+     * The app will try to honor these, but will clamp them to the size of the preview frame.
      * You should specify both or neither, and pass the size as an int.
      */
     public static final String WIDTH = "SCAN_WIDTH";
@@ -124,20 +125,20 @@ public final class Intents {
      * of the app which requested the scan via
      * {@link android.app.Activity#startActivityForResult(android.content.Intent, int)}
      * The barcodes contents can be retrieved with
-     * {@link android.content.Intent#getStringExtra(String)}.
+     * {@link android.content.Intent#getStringExtra(String)}. 
      * If the user presses Back, the result code will be {@link android.app.Activity#RESULT_CANCELED}.
      */
     public static final String RESULT = "SCAN_RESULT";
 
     /**
-     * Call {@link android.content.Intent#getStringExtra(String)} with {@code RESULT_FORMAT}
+     * Call {@link android.content.Intent#getStringExtra(String)} with {@link #RESULT_FORMAT}
      * to determine which barcode format was found.
      * See {@link com.google.zxing.BarcodeFormat} for possible values.
      */
     public static final String RESULT_FORMAT = "SCAN_RESULT_FORMAT";
 
     /**
-     * Call {@link android.content.Intent#getStringExtra(String)} with {@code RESULT_UPC_EAN_EXTENSION}
+     * Call {@link android.content.Intent#getStringExtra(String)} with {@link #RESULT_UPC_EAN_EXTENSION}
      * to return the content of any UPC extension barcode that was also found. Only applicable
      * to {@link com.google.zxing.BarcodeFormat#UPC_A} and {@link com.google.zxing.BarcodeFormat#EAN_13}
      * formats.
@@ -145,20 +146,20 @@ public final class Intents {
     public static final String RESULT_UPC_EAN_EXTENSION = "SCAN_RESULT_UPC_EAN_EXTENSION";
 
     /**
-     * Call {@link android.content.Intent#getByteArrayExtra(String)} with {@code RESULT_BYTES}
+     * Call {@link android.content.Intent#getByteArrayExtra(String)} with {@link #RESULT_BYTES}
      * to get a {@code byte[]} of raw bytes in the barcode, if available.
      */
     public static final String RESULT_BYTES = "SCAN_RESULT_BYTES";
 
     /**
      * Key for the value of {@link com.google.zxing.ResultMetadataType#ORIENTATION}, if available.
-     * Call {@link android.content.Intent#getIntArrayExtra(String)} with {@code RESULT_ORIENTATION}.
+     * Call {@link android.content.Intent#getIntArrayExtra(String)} with {@link #RESULT_ORIENTATION}.
      */
     public static final String RESULT_ORIENTATION = "SCAN_RESULT_ORIENTATION";
 
     /**
      * Key for the value of {@link com.google.zxing.ResultMetadataType#ERROR_CORRECTION_LEVEL}, if available.
-     * Call {@link android.content.Intent#getStringExtra(String)} with {@code RESULT_ERROR_CORRECTION_LEVEL}.
+     * Call {@link android.content.Intent#getStringExtra(String)} with {@link #RESULT_ERROR_CORRECTION_LEVEL}.
      */
     public static final String RESULT_ERROR_CORRECTION_LEVEL = "SCAN_RESULT_ERROR_CORRECTION_LEVEL";
 
@@ -174,6 +175,36 @@ public final class Intents {
      * Setting this to false will not save scanned codes in the history. Specified as a {@code boolean}.
      */
     public static final String SAVE_HISTORY = "SAVE_HISTORY";
+
+    /**
+     * Set to true if we want to show the button to flip the camera (if available)
+     */
+    public static final String SHOW_FLIP_CAMERA_BUTTON = "SHOW_FLIP_CAMERA_BUTTON";
+
+    /**
+     * Set to true if we want to show the button to toggle the torch (if available)
+     */
+    public static final String SHOW_TORCH_BUTTON = "SHOW_TORCH_BUTTON";
+
+    /**
+     * Set to true if we want to show the launch with the torch toggled on
+     */
+    public static final String TORCH_ON = "TORCH_ON";
+
+    /**
+     * Set to false if you want to suppress the beep when a code is scanned
+     */
+    public static final String BEEP_ON_SCAN = "BEEP_ON_SCAN";
+
+    /**
+     * Set to true if you want to enable bulk scan mode
+     */
+    public static final String BULK_SCAN = "BULK_SCAN";
+
+    /**
+     * Lock to "landscape" or "portrait" to override the default sensor-driven scan
+     */
+    public static final String ORIENTATION_LOCK = "ORIENTATION_LOCK";
 
     private Scan() {
     }
